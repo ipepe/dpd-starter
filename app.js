@@ -16,6 +16,43 @@ module.exports = (function(){
 				}
 			}
 		},
+		clouds_definitions: {},
+		isCloudDefValid:function(cloud_definition){
+			if(typeof cloud_definition !== 'object'){
+				console.error('Invalid cloud definition', cloud_definition, 'should be object');
+				return false;
+			}
+			if(typeof cloud_definition.name !== 'string'){
+				console.error('Invalid cloud definition', cloud_definition, 'name should be string');
+				return false;
+			}
+			if(typeof cloud_definition.default_config !== 'object'){
+				console.error('Invalid cloud definition', cloud_definition, 'default_config should be object');
+				return false;
+			}
+			if(typeof cloud_definition.isDetected !== 'function'){
+				console.error('Invalid cloud definition', cloud_definition, 'isDetected should be function');
+				return false;
+			}
+			if(typeof cloud_definition.isDetected() !== 'boolean'){
+				console.error('Invalid cloud definition', cloud_definition, 'isDetected() should return boolean');
+				return false;
+			}
+			return true;
+		},
+		importCloudDefinitions: function(directory){
+			var fs = require('fs');
+			var clouds_array;
+			fs.readdir(directory, function(error,result){
+				result.forEach(function(cloud_file_name){
+					var cloud_def = require(directory+'/'+cloud_file_name);
+					if(starter_instance.isCloudDefValid(cloud_def)){
+						starter_instance.clouds_definitions[cloud_def.name.toLowerCase()] = cloud_def;
+					}
+				});
+			});
+			return starter_instance;
+		},
 		setConfig: function(options){
 			if(typeof options == "object"){
 				starter_instance.config.host = options.host || starter_instance.config.host;
@@ -67,45 +104,35 @@ module.exports = (function(){
 				return starter_instance;
 			}
 			cloud_name = cloud_name.toLowerCase();
-			switch(cloud_name){
-				case 'auto':
-				starter_instance.setCloudToAuto(cloud_options);
-				break;
-				case 'azure':
-				starter_instance.setCloudToAzure(cloud_options);
-				break;
-				case 'openshift':
-				starter_instance.setCloudToOpenShift(cloud_options);
-				break;
-				case 'heroku':
-				starter_instance.setCloudToHeroku(cloud_options);
-				break;
-				default:
-					console.error('Cloud definition', cloud_name, 'was not found');
+			var cloud_def = starter_instance.clouds_definitions[cloud_name];
+			if(typeof cloud_def === 'object'){
+				if(cloud_def.isDetected()){
+					starter_instance.setConfig(cloud_def.default_config).setConfig(cloud_options);
+				}
+			}else{
+				console.error('Cloud', cloud_name, 'was not found');
 			}
 			return starter_instance;
 		},
 		detectCloudName: function(){
-			if( starter_instance.isAzureCloud() ){
-				return 'azure';
-			}else if( starter_instance.isHerokuCloud() ){
-				return 'heroku';
-			}else if( starter_instance.isOpenShiftCloud() ){
-				return 'openshift';
-			}else{
-				return 'unknown';
-			}
+			starter_instance.clouds_definitions.forEach(function(cloud_def){
+				if(cloud_def.isDetected()){
+					return cloud_def.name;
+				}
+			});
+			return 'unknown';
 		},
 		setCloudToAuto: function(cloud_options){
 			// TODO - czy nie dałoby rady lepiej wywolac ten detectCloud?
-			starter_instance.setCloudTo( starter_instance.detectCloud(), cloud_options);
+			starter_instance.setCloudTo( starter_instance.detectCloudName(), cloud_options);
 
 		},
 		startServer: function(after_start_callback){
+			console.log('Starting server with config', starter_instance.config);
 			var server = require('deployd')(starter_instance.config);
 			server.listen();
 			server.on('listening', function() {
-				console.log('Server is listening at', server.options.host, server.options.port);
+				console.log('Server started listening',(new Date()).toUTCString(),'at', server.options.host, server.options.port);
 				if ( typeof after_start_callback === "function" ) after_start_callback();
 			});
 			server.on('error', function(err) {
@@ -120,5 +147,5 @@ module.exports = (function(){
 		}
 
 	};
-	return starter_instance;
+	return starter_instance.importCloudDefinitions('./clouds');
 })();

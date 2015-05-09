@@ -1,6 +1,6 @@
 module.exports = {
-  cloudName: ('openshift'),
-  cloudConfig: {
+  name: ('openshift'),
+  default_config: {
     host: process.env.OPENSHIFT_NODEJS_IP,
     port: process.env.OPENSHIFT_NODEJS_PORT,
     env: process.env.NODE_ENV,

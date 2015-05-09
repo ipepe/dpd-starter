@@ -1,6 +1,6 @@
 module.exports = {
-  cloudName: ('heroku'),
-  cloudConfig: {
+  name: ('heroku'),
+  default_config: {
     port: process.env.port,
     db_connection_url: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI
   },
