@@ -6,7 +6,7 @@ module.exports = {
   },
   isDetected: function(){
     for(var key in process.env){
-      if( key.indexOf('azure') > -1){
+      if( key.toLowerCase().indexOf('azure') > -1){
         return true;
       }
     }
