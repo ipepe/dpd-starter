@@ -1,5 +1,4 @@
 //Author: Patryk "ipepe" Ptasiński npm@ipepe.pl, credit to: schettino72
-//Author: Patryk "ipepe" Ptasiński npm@ipepe.pl, credit to: schettino72
 module.exports = (function(){
 	var starter_instance = {
 		config: {
