@@ -85,16 +85,20 @@ module.exports = (function(){
 			}
 			return starter_instance;
 		},
+		detectCloudName: function(){
+			if( starter_instance.isAzureCloud() ){
+				return 'azure';
+			}else if( starter_instance.isHerokuCloud() ){
+				return 'heroku';
+			}else if( starter_instance.isOpenShiftCloud() ){
+				return 'openshift';
+			}else{
+				return 'unknown';
+			}
+		},
 		setCloudToAuto: function(cloud_options){
-
-		},
-		setCloudToAzure: function(cloud_options){
-
-		},
-		setCloudToOpenShift: function(cloud_options){
-
-		},
-		setCloudToHeroku: function(cloud_options){
+			// TODO - czy nie dałoby rady lepiej wywolac ten detectCloud?
+			starter_instance.setCloudTo( starter_instance.detectCloud(), cloud_options);
 
 		},
 		startServer: function(after_start_callback){
