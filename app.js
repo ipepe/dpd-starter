@@ -106,7 +106,7 @@ module.exports = (function(){
 			var cloud_def = starter_instance.clouds_definitions[cloud_name];
 			if(typeof cloud_def === 'object'){
 				if(cloud_def.isDetected()){
-					starter_instance.setConfig(cloud_def.default_config).setConfig(cloud_options);
+					return starter_instance.setConfig(cloud_def.default_config).setConfig(cloud_options);
 				}
 			}else{
 				console.error('Cloud', cloud_name, 'was not found');
@@ -114,16 +114,16 @@ module.exports = (function(){
 			return starter_instance;
 		},
 		detectCloudName: function(){
-			starter_instance.clouds_definitions.forEach(function(cloud_def){
-				if(cloud_def.isDetected()){
-					return cloud_def.name;
+			Object.keys(starter_instance.clouds_definitions).forEach(function(cloud_def_name){
+				if(starter_instance.clouds_definitions[cloud_def_name].isDetected()){
+					return cloud_def_name;
 				}
 			});
 			return 'unknown';
 		},
 		setCloudToAuto: function(cloud_options){
 			// TODO - czy nie dałoby rady lepiej wywolac ten detectCloud?
-			starter_instance.setCloudTo( starter_instance.detectCloudName(), cloud_options);
+			return starter_instance.setCloudTo( starter_instance.detectCloudName(), cloud_options);
 
 		},
 		startServer: function(after_start_callback){
@@ -146,5 +146,5 @@ module.exports = (function(){
 		}
 
 	};
-	return starter_instance.importCloudDefinitions('./clouds');
+	return starter_instance.importCloudDefinitions(__dirname + '/clouds');
 })();
