@@ -15,7 +15,7 @@ module.exports = (function(){
 				}
 			}
 		},
-		clouds_definitions: {},
+		cloud_definitions: {},
 		isCloudDefValid:function(cloud_definition){
 			if(typeof cloud_definition !== 'object'){
 				console.error('Invalid cloud definition', cloud_definition, 'should be object');
@@ -41,15 +41,15 @@ module.exports = (function(){
 		},
 		importCloudDefinitions: function(directory){
 			var fs = require('fs');
-			var clouds_array;
-			fs.readdir(directory, function(error,result){
-				result.forEach(function(cloud_file_name){
-					var cloud_def = require(directory+'/'+cloud_file_name);
-					if(starter_instance.isCloudDefValid(cloud_def)){
-						starter_instance.clouds_definitions[cloud_def.name.toLowerCase()] = cloud_def;
-					}
-				});
-			});
+			var clouds_array = fs.readdirSync(directory);
+			for(var i=0; i<clouds_array.length; i++){
+				var cloud_file_name = clouds_array[i];
+				var cloud_def = require(directory+'/'+cloud_file_name);
+				if(starter_instance.isCloudDefValid(cloud_def)){
+					console.log('Imported cloud definition',cloud_def.name.toLowerCase());
+					starter_instance.cloud_definitions[cloud_def.name.toLowerCase()] = cloud_def;
+				}
+			}
 			return starter_instance;
 		},
 		setConfig: function(options){
@@ -103,7 +103,7 @@ module.exports = (function(){
 				return starter_instance;
 			}
 			cloud_name = cloud_name.toLowerCase();
-			var cloud_def = starter_instance.clouds_definitions[cloud_name];
+			var cloud_def = starter_instance.cloud_definitions[cloud_name];
 			if(typeof cloud_def === 'object'){
 				if(cloud_def.isDetected()){
 					return starter_instance.setConfig(cloud_def.default_config).setConfig(cloud_options);
@@ -114,8 +114,8 @@ module.exports = (function(){
 			return starter_instance;
 		},
 		detectCloudName: function(){
-			Object.keys(starter_instance.clouds_definitions).forEach(function(cloud_def_name){
-				if(starter_instance.clouds_definitions[cloud_def_name].isDetected()){
+			Object.keys(starter_instance.cloud_definitions).forEach(function(cloud_def_name){
+				if(starter_instance.cloud_definitions[cloud_def_name].isDetected()){
 					return cloud_def_name;
 				}
 			});

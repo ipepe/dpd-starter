@@ -1,6 +1,6 @@
 {
   "name": "dpd-starter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "dpd-starter is helper for starting deployd in cloud services",
   "main": "app.js",
   "scripts": {
