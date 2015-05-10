@@ -46,7 +46,6 @@ module.exports = (function(){
 				var cloud_file_name = clouds_array[i];
 				var cloud_def = require(directory+'/'+cloud_file_name);
 				if(starter_instance.isCloudDefValid(cloud_def)){
-					console.log('Imported cloud definition',cloud_def.name.toLowerCase());
 					starter_instance.cloud_definitions[cloud_def.name.toLowerCase()] = cloud_def;
 				}
 			}
@@ -106,6 +105,7 @@ module.exports = (function(){
 			var cloud_def = starter_instance.cloud_definitions[cloud_name];
 			if(typeof cloud_def === 'object'){
 				if(cloud_def.isDetected()){
+					console.log('Cloud',cloud_def.name,'found setting up config...');
 					return starter_instance.setConfig(cloud_def.default_config).setConfig(cloud_options);
 				}
 			}else{
