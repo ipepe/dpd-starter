@@ -1,7 +1,7 @@
 {
   "name": "dpd-starter",
-  "version": "0.3.0",
-  "description": "dpd-starter is helper for starting deployd in cloud services",
+  "version": "0.3.2",
+  "description": "Module that wrap around configuring and starting deployd framework on many cloud hostings",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
